@@ -48,7 +48,9 @@ function makeApiRequest(params, sendResponse) {
   const {url, apiKey, organization, project, retryCount = 0} = params;
   const prompt = `Summarise the following article ${url}.
   Remember to not include any requests for clarification or offers for more information,
-  since this is a one-way interaction with no opportunity for follow-up.`;
+  since this is a one-way interaction with no opportunity for follow-up.
+  When summarizing, if the article is in Romanian, use the same language.
+  If the article is in English, or another language, use English.`;
   const maxRetries = 3;
 
   // Log API key information (safely)

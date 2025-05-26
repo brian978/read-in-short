@@ -224,6 +224,7 @@ h1 {
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   min-height: 100px;
+  font-size: 1.1em;
 }
 
 .container-expanded #summary-content {
