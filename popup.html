@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ReadInShort</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>ReadInShort</h1>
+
+    <div id="initial-view">
+      <button id="summarize-btn" class="btn primary-btn">Summarise</button>
+    </div>
+
+    <div id="loading-view" class="hidden">
+      <div class="spinner"></div>
+      <p>Summarizing article...</p>
+    </div>
+
+    <div id="summary-view" class="hidden">
+      <div id="summary-content"></div>
+      <button id="reset-btn" class="btn primary-btn">Reset</button>
+    </div>
+
+    <div class="footer">
+      <a href="settings.html" target="_blank">Settings</a>
+    </div>
+  </div>
+
+  <script src="assets/marked.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

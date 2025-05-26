@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ReadInShort - Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container settings-container">
+    <h1>Settings</h1>
+
+    <div class="form-group">
+      <label for="api-key">OpenAI API Key:</label>
+      <input type="password" id="api-key" placeholder="Enter your OpenAI API key">
+
+      <label for="api-org">OpenAI Organization ID:</label>
+      <input type="text" id="api-org" placeholder="Enter your OpenAI Organization ID (optional)">
+
+      <label for="api-project">OpenAI Project ID:</label>
+      <input type="text" id="api-project" placeholder="Enter your OpenAI Project ID (optional)">
+
+      <button id="save-btn" class="btn primary-btn">Save</button>
+      <button id="validate-btn" class="btn secondary-btn">Validate Key</button>
+      <button id="remove-btn" class="btn danger-btn">Remove Key</button>
+    </div>
+
+    <div id="status-message" class="hidden"></div>
+
+    <div id="api-status" class="api-status">
+      <div class="status-indicator"></div>
+      <span id="api-status-text">API Key Status: Unknown</span>
+    </div>
+
+    <div class="info-box">
+      <h3>How to get an OpenAI API Key:</h3>
+      <ol>
+        <li>Go to <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys</a></li>
+        <li>Sign in or create an account</li>
+        <li>Create a new API key</li>
+        <li>Copy and paste the key above</li>
+      </ol>
+      <p><strong>Note:</strong> Your API key is stored locally on your device and is only used to make requests to the OpenAI API.</p>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
