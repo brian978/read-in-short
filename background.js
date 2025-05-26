@@ -46,7 +46,9 @@ function processQueue() {
 // Make the actual API request
 function makeApiRequest(params, sendResponse) {
   const {url, apiKey, organization, project, retryCount = 0} = params;
-  const prompt = `Summarise the following article ${url}`;
+  const prompt = `Summarise the following article ${url}.
+  Remember to not include any requests for clarification or offers for more information,
+  since this is a one-way interaction with no opportunity for follow-up.`;
   const maxRetries = 3;
 
   // Log API key information (safely)

@@ -30,6 +30,16 @@ document.addEventListener('DOMContentLoaded', function() {
     summaryView.classList.add('hidden');
 
     viewToShow.classList.remove('hidden');
+
+    // Get the container element
+    const container = document.querySelector('.container');
+
+    // Add or remove the expanded class based on which view is shown
+    if (viewToShow === summaryView) {
+      container.classList.add('container-expanded');
+    } else {
+      container.classList.remove('container-expanded');
+    }
   }
 
   // Function to reset to initial view
