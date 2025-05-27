@@ -1,2 +1,10 @@
+# IDE
 .idea
-node_modules
+.vscode
+
+# Environment
+.env
+
+# Build and distribution
+dist/*
+.amo-upload-uuid

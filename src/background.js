@@ -7,10 +7,10 @@ const MIN_REQUEST_INTERVAL = 1000; // Minimum 1 second between requests
 let lastRequestTime = 0;
 
 // Listen for installation
-chrome.runtime.onInstalled.addListener(function(details) {
+browser.runtime.onInstalled.addListener(function(details) {
   if (details.reason === 'install') {
     // Open the settings page on installation
-    chrome.tabs.create({
+    browser.tabs.create({
       url: 'settings.html',
     }).then(tab => {
       console.log(`Opened settings page in new tab: ${tab.id}`);
@@ -167,7 +167,7 @@ function makeApiRequest(params, sendResponse) {
 }
 
 // Handle messages from popup or content scripts
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'summarizeArticle') {
     // Add request to queue
     apiRequestQueue.push({
