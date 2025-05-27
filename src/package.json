@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "@types/chrome": "^0.0.323"
+    "@types/chrome": "^0.0.323",
+    "web-ext": "^8.7.1"
   },
   "dependencies": {
     "sharp": "^0.32.1"

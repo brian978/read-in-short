@@ -1,0 +1,70 @@
+name: Sign and Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+
+      - name: Install web-ext
+        run: npm install -g web-ext
+
+      # Firefox Deployment
+      - name: Run sign.sh (Firefox)
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          chmod +x ./sign.sh
+          ./sign.sh
+
+      - name: Run rename.sh (Firefox)
+        run: |
+          chmod +x ./rename.sh
+          ./rename.sh
+
+      - name: Upload Firefox extension (.xpi)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: ./dist/*.xpi
+
+#      # Chrome Deployment
+#      - name: Run Chrome Web Store deployment
+#        env:
+#          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+#          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+#          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+#          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+#        run: |
+#          chmod +x ./chrome-deploy.sh
+#          ./chrome-deploy.sh
+#
+#      - name: Upload Chrome extension (.zip)
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: chrome-extension
+#          path: ./dist/*.zip
+
+      # GitHub Release
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./dist/*.xpi
+            ./dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.EXT_TOKEN }}

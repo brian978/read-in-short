@@ -3,6 +3,12 @@
   "name": "ReadInShort",
   "version": "1.0",
   "description": "Summarize articles using ChatGPT",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "readinshort@example.com",
+      "strict_min_version": "109.0"
+    }
+  },
   "permissions": [
     "activeTab",
     "storage"
@@ -20,14 +26,17 @@
     "48": "images/icon48.png",
     "128": "images/icon128.png"
   },
-  "options_page": "settings.html",
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": true
+  },
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["browser-polyfill.js", "background.js"]
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["browser-polyfill.js", "content.js"]
     }
   ]
 }

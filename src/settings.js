@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const statusIndicator = document.querySelector('.status-indicator');
 
   // Load saved API key and other settings if they exist
-  chrome.storage.sync.get(['openai_api_key', 'api_key_status', 'openai_organization', 'openai_project'], function(result) {
+  browser.storage.sync.get(['openai_api_key', 'api_key_status', 'openai_organization', 'openai_project']).then(function(result) {
     if (result.openai_api_key) {
       apiKeyInput.value = result.openai_api_key;
 
@@ -50,16 +50,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const organization = apiOrgInput.value.trim();
     const project = apiProjectInput.value.trim();
 
-    // Save to Chrome storage
-    chrome.storage.sync.set({
+    // Save to browser storage
+    browser.storage.sync.set({
       openai_api_key: apiKey,
       openai_organization: organization,
       openai_project: project
-    }, function() {
+    }).then(function() {
       showStatus('Settings saved successfully!', 'success');
 
       // Test the API key with a simple request
       testApiKey(apiKey);
+    }).catch(function(error) {
+      showStatus('Error saving settings: ' + error.message, 'error');
     });
   });
 
@@ -89,8 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Add event listener for remove button
   removeButton.addEventListener('click', function() {
-    // Remove API key and other settings from Chrome storage
-    chrome.storage.sync.remove(['openai_api_key', 'api_key_status', 'openai_organization', 'openai_project'], function() {
+    // Remove API key and other settings from browser storage
+    browser.storage.sync.remove(['openai_api_key', 'api_key_status', 'openai_organization', 'openai_project']).then(function() {
       // Clear the input fields
       apiKeyInput.value = '';
       apiOrgInput.value = '';
@@ -101,6 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Show success message
       showStatus('Settings removed successfully!', 'success');
+    }).catch(function(error) {
+      showStatus('Error removing settings: ' + error.message, 'error');
     });
   });
 
@@ -125,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
       updateApiStatusIndicator('valid');
 
       // Store the API key status
-      chrome.storage.sync.set({api_key_status: 'valid'});
+      browser.storage.sync.set({api_key_status: 'valid'});
     })
     .catch(error => {
       console.error('Error validating API key:', error);
@@ -133,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
       updateApiStatusIndicator('invalid');
 
       // Store the API key status
-      chrome.storage.sync.set({api_key_status: 'invalid'});
+      browser.storage.sync.set({api_key_status: 'invalid'});
     });
   }
 
