@@ -1,3 +1,11 @@
+# IDE/Editor
 .idea
+
+# Dependencies
 node_modules
+
+# Environment
 .env
+
+# Build
+.dist

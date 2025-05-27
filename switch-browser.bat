@@ -2,19 +2,19 @@
 REM Script to switch between Firefox and Chrome configurations
 
 REM Check if manifest.json exists
-if not exist manifest.json (
-  echo Error: manifest.json not found.
+if not exist src\manifest.json (
+  echo Error: src\manifest.json not found.
   exit /b 1
 )
 
 REM Check if manifest_firefox.json exists
-if not exist manifest_firefox.json (
-  echo Error: manifest_firefox.json not found.
+if not exist src\manifest_firefox.json (
+  echo Error: src\manifest_firefox.json not found.
   exit /b 1
 )
 
 REM Check current configuration
-findstr /C:"service_worker" manifest.json >nul
+findstr /C:"service_worker" src\manifest.json >nul
 if %ERRORLEVEL% == 0 (
   set CURRENT_CONFIG=chrome
 ) else (
@@ -36,7 +36,7 @@ if "%1" == "firefox" (
 )
 
 REM Display current configuration
-findstr /C:"service_worker" manifest.json >nul
+findstr /C:"service_worker" src\manifest.json >nul
 if %ERRORLEVEL% == 0 (
   echo Current configuration: ReadInShort for Chrome
 ) else (
@@ -55,13 +55,13 @@ if "%CURRENT_CONFIG%" == "firefox" (
 )
 
 REM Backup Chrome manifest if needed
-if not exist manifest_chrome.json (
+if not exist src\manifest_chrome.json (
   echo Backing up Chrome manifest...
-  copy manifest.json manifest_chrome.json >nul
+  copy src\manifest.json src\manifest_chrome.json >nul
 )
 
 REM Replace manifest with Firefox version
-copy manifest_firefox.json manifest.json >nul
+copy src\manifest_firefox.json src\manifest.json >nul
 echo Switched to Firefox configuration.
 exit /b 0
 
@@ -75,19 +75,19 @@ if "%CURRENT_CONFIG%" == "chrome" (
 )
 
 REM Backup Firefox manifest if needed
-fc manifest.json manifest_firefox.json >nul
+fc src\manifest.json src\manifest_firefox.json >nul
 if %ERRORLEVEL% NEQ 0 (
   echo Backing up Firefox manifest...
-  copy manifest.json manifest_firefox.json >nul
+  copy src\manifest.json src\manifest_firefox.json >nul
 )
 
 REM Replace manifest with Chrome version
-if exist manifest_chrome.json (
-  copy manifest_chrome.json manifest.json >nul
+if exist src\manifest_chrome.json (
+  copy src\manifest_chrome.json src\manifest.json >nul
 ) else (
   REM Create a default Chrome manifest if one doesn't exist
   echo Creating default Chrome manifest...
-  powershell -Command "(Get-Content manifest.json) -replace '\"scripts\": \[\"browser-polyfill.js\", \"background.js\"\]', '\"service_worker\": \"background-wrapper.js\"' | Set-Content manifest.json"
+  powershell -Command "(Get-Content src\manifest.json) -replace '\"scripts\": \[\"browser-polyfill.js\", \"background.js\"\]', '\"service_worker\": \"background-wrapper.js\"' | Set-Content src\manifest.json"
 )
 
 echo Switched to Chrome configuration.

@@ -14,26 +14,26 @@ A browser extension that summarizes articles using ChatGPT. Compatible with both
 ### Firefox
 1. Download the extension files
 2. Firefox configuration is set as default, but you can ensure it with:
-   - On Windows: Run `switch-browser.bat firefox`
-   - On Linux/Mac: Run `chmod +x switch-browser.sh && ./switch-browser.sh firefox`
+   - On Windows: Run `switch-browser.bat firefox` from the root directory
+   - On Linux/Mac: Run `chmod +x switch-browser.sh && ./switch-browser.sh firefox` from the root directory
 3. Open Firefox and navigate to `about:debugging`
 4. Click "This Firefox" in the sidebar
 5. Click "Load Temporary Add-on"
-6. Select the manifest.json file from the extension directory
+6. Select the src/manifest.json file from the extension directory
 
 ### Chrome
 1. Download the extension files
 2. Switch to Chrome configuration:
-   - On Windows: Run `switch-browser.bat chrome`
-   - On Linux/Mac: Run `chmod +x switch-browser.sh && ./switch-browser.sh chrome`
+   - On Windows: Run `switch-browser.bat chrome` from the root directory
+   - On Linux/Mac: Run `chmod +x switch-browser.sh && ./switch-browser.sh chrome` from the root directory
 3. Open Chrome and navigate to `chrome://extensions/`
 4. Enable "Developer mode" in the top-right corner
-5. Click "Load unpacked" and select the extension directory
+5. Click "Load unpacked" and select the src directory
 
 ### Manual Configuration (Alternative)
 If you prefer to manually configure the extension:
-- For Firefox: Rename `manifest_firefox.json` to `manifest.json` (replace the existing file)
-- For Chrome: Make sure you're using a manifest.json with `service_worker` instead of `scripts`
+- For Firefox: Rename `src/manifest_firefox.json` to `src/manifest.json` (replace the existing file)
+- For Chrome: Make sure you're using a manifest.json with `service_worker` instead of `scripts` in the src directory
 
 ## Usage
 
@@ -50,24 +50,24 @@ This extension is compatible with:
 
 ### Browser-Specific Manifest Files
 
-Due to differences in how Firefox and Chrome handle background scripts in Manifest V3, this extension includes two manifest files:
+Due to differences in how Firefox and Chrome handle background scripts in Manifest V3, this extension includes two manifest files in the src directory:
 
-- `manifest.json` - Default manifest for Firefox (by default in this repository)
-- `manifest_firefox.json` - Backup of the Firefox manifest
-- `manifest_chrome.json` - Created when switching to Chrome configuration
+- `src/manifest.json` - Default manifest for Firefox (by default in this repository)
+- `src/manifest_firefox.json` - Backup of the Firefox manifest
+- `src/manifest_chrome.json` - Created when switching to Chrome configuration
 
-The key difference is that Chrome requires background scripts to be defined using `service_worker`, while Firefox requires `scripts`. Use the provided switch-browser scripts to easily switch between configurations.
+The key difference is that Chrome requires background scripts to be defined using `service_worker`, while Firefox requires `scripts`. Use the provided switch-browser scripts in the root directory to easily switch between configurations.
 
 ## Development
 
 ### Switching Browser Configurations
 
-The extension includes scripts to easily switch between Firefox and Chrome configurations:
+The extension includes scripts in the root directory to easily switch between Firefox and Chrome configurations:
 
 - `switch-browser.sh` (Linux/Mac) - Bash script to switch configurations
 - `switch-browser.bat` (Windows) - Batch file to switch configurations
 
-Usage:
+Usage (from the root directory):
 ```
 # Switch to Firefox configuration
 ./switch-browser.sh firefox  # Linux/Mac

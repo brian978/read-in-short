@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "marked": "^15.0.12",
+    "web-ext": "^8.7.1"
+  }
+}

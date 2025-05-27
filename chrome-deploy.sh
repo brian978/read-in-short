@@ -19,12 +19,12 @@ mkdir -p dist
 # Package the extension
 echo "Packaging extension for Chrome Web Store..."
 web-ext build \
-  --source-dir ./ \
+  --source-dir ./src \
   --artifacts-dir ./dist \
   --overwrite-dest
 
 # Rename the zip file
-VERSION=$(grep -o '"version": "[^"]*"' manifest.json | cut -d'"' -f4)
+VERSION=$(grep -o '"version": "[^"]*"' src/manifest.json | cut -d'"' -f4)
 ZIP_FILE=$(find ./dist -name "*.zip" | head -n 1)
 NEW_NAME="./dist/readinshort-chrome-v${VERSION}.zip"
 mv "$ZIP_FILE" "$NEW_NAME"
