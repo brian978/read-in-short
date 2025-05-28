@@ -50,7 +50,9 @@ function makeApiRequest(params, sendResponse) {
   Remember to not include any requests for clarification or offers for more information,
   since this is a one-way interaction with no opportunity for follow-up.
   When summarizing, if the article is in Romanian, use the same language.
-  If the article is in English, or another language, use English. Instead of providing the response in Markdown format, use HTML tags.`;
+  If the article is in English, or another language, use English. Instead of providing the response in Markdown format, use HTML tags.
+  Please keep going until the user’s query is completely resolved, before ending your turn and yielding back to the user. Only terminate your turn when you are sure that the problem is solved.
+  Use only the context of the article for summarization. DO NOT use your pre-existing knowledge to summarize the article.`;
   const maxRetries = 3;
 
   // Log API key information (safely)
