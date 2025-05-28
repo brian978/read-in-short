@@ -9,14 +9,29 @@
     <h1>Settings</h1>
 
     <div class="form-group">
-      <label for="api-key">OpenAI API Key:</label>
-      <input type="password" id="api-key" placeholder="Enter your OpenAI API key">
+      <div class="provider-selection">
+        <label>AI Provider:</label>
+        <div class="checkbox-container">
+          <input type="checkbox" id="use-claude" name="use-claude">
+          <label for="use-claude">Use Claude AI (Anthropic)</label>
+        </div>
+      </div>
 
-      <label for="api-org">OpenAI Organization ID:</label>
-      <input type="text" id="api-org" placeholder="Enter your OpenAI Organization ID (optional)">
+      <div id="openai-settings">
+        <label for="api-key">OpenAI API Key:</label>
+        <input type="password" id="api-key" placeholder="Enter your OpenAI API key">
 
-      <label for="api-project">OpenAI Project ID:</label>
-      <input type="text" id="api-project" placeholder="Enter your OpenAI Project ID (optional)">
+        <label for="api-org">OpenAI Organization ID:</label>
+        <input type="text" id="api-org" placeholder="Enter your OpenAI Organization ID (optional)">
+
+        <label for="api-project">OpenAI Project ID:</label>
+        <input type="text" id="api-project" placeholder="Enter your OpenAI Project ID (optional)">
+      </div>
+
+      <div id="anthropic-settings">
+        <label for="anthropic-api-key">Anthropic API Key:</label>
+        <input type="password" id="anthropic-api-key" placeholder="Enter your Anthropic API key">
+      </div>
 
       <button id="save-btn" class="btn primary-btn">Save</button>
       <button id="validate-btn" class="btn secondary-btn">Validate Key</button>
@@ -31,14 +46,23 @@
     </div>
 
     <div class="info-box">
-      <h3>How to get an OpenAI API Key:</h3>
-      <ol>
+      <h3 id="openai-info">How to get an OpenAI API Key:</h3>
+      <ol id="openai-steps">
         <li>Go to <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys</a></li>
         <li>Sign in or create an account</li>
         <li>Create a new API key</li>
         <li>Copy and paste the key above</li>
       </ol>
-      <p><strong>Note:</strong> Your API key is stored on your device and is only used to make requests to the OpenAI API.</p>
+
+      <h3 id="anthropic-info">How to get an Anthropic API Key:</h3>
+      <ol id="anthropic-steps">
+        <li>Go to <a href="https://console.anthropic.com/account/keys" target="_blank">Anthropic Console</a></li>
+        <li>Sign in or create an account</li>
+        <li>Create a new API key</li>
+        <li>Copy and paste the key above</li>
+      </ol>
+
+      <p><strong>Note:</strong> Your API keys are stored on your device and are only used to make requests to the respective APIs.</p>
     </div>
   </div>
 
