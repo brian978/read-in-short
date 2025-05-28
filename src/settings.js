@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const apiStatusText = document.getElementById('api-status-text');
   const statusIndicator = document.querySelector('.status-indicator');
 
-  // Load saved API key and other settings if they exist
+  // Load saved an API key and other settings if they exist
   browser.storage.sync.get(['openai_api_key', 'api_key_status', 'openai_organization', 'openai_project']).then(function(result) {
     if (result.openai_api_key) {
       apiKeyInput.value = result.openai_api_key;
 
-      // Update API status indicator if we have a stored status
+      // Update the API status indicator if we have a stored status
       if (result.api_key_status) {
         updateApiStatusIndicator(result.api_key_status);
       }
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Save API key when save button is clicked
+  // Save API key when the save button is clicked
   saveButton.addEventListener('click', function() {
     const apiKey = apiKeyInput.value.trim();
 

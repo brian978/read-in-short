@@ -7,16 +7,25 @@ document.addEventListener('DOMContentLoaded', function() {
   const summarizeBtn = document.getElementById('summarize-btn');
   const resetBtn = document.getElementById('reset-btn');
 
-  // Check if API key is set and load other settings
-  browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project', 'saved_summary']).then(function(result) {
-    if (!result.openai_api_key) {
-      summaryContent.innerHTML = '<p class="error">Please set your OpenAI API key in the <a href="settings.html" target="_blank">settings</a>.</p>';
-      showView(summaryView);
-    } else if (result.saved_summary) {
-      // If we have a saved summary, display it
-      summaryContent.innerHTML = marked.parse(result.saved_summary);
-      showView(summaryView);
-    }
+  // Check if an API key is set and load other settings
+  browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) {
+    const currentUrl = tabs[0].url;
+
+    browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project', 'saved_summary', 'summary_url']).then(function(result) {
+      if (!result.openai_api_key) {
+        summaryContent.innerHTML = '<p class="error">Please set your OpenAI API key in the <a href="settings.html" target="_blank">settings</a>.</p>';
+        showView(summaryView);
+      } else if (result.saved_summary && result.summary_url === currentUrl) {
+        // If we have a saved summary for the current URL, display it
+        summaryContent.innerHTML = marked.parse(result.saved_summary);
+        showView(summaryView);
+      } else if (result.saved_summary && result.summary_url !== currentUrl) {
+        // If the URL has changed, clear the saved summary
+        browser.storage.sync.remove(['saved_summary', 'summary_url']).then(function() {
+          showView(initialView);
+        });
+      }
+    });
   });
 
   // Add event listeners
@@ -44,8 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to reset to initial view
   function resetView() {
-    // Clear the saved summary
-    browser.storage.sync.remove('saved_summary').then(function() {
+    // Clear the saved summary and URL
+    browser.storage.sync.remove(['saved_summary', 'summary_url']).then(function() {
       showView(initialView);
     });
   }
@@ -58,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) {
       const currentUrl = tabs[0].url;
 
-      // Get API key and other settings from storage
+      // Get an API key and other settings from storage
       browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project']).then(function(result) {
         if (!result.openai_api_key) {
           summaryContent.innerHTML = '<p class="error">Please set your OpenAI API key in the <a href="settings.html" target="_blank">settings</a>.</p>';
@@ -79,8 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
           if (response && response.success) {
             const summary = response.data.output[0].content[0].text.trim();
 
-            // Save the summary to browser storage
-            browser.storage.sync.set({ 'saved_summary': summary }).then(function() {
+            // Save the summary and URL to browser storage
+            browser.storage.sync.set({ 
+              'saved_summary': summary,
+              'summary_url': currentUrl
+            }).then(function() {
               // Parse the Markdown and display it
               summaryContent.innerHTML = marked.parse(summary);
               showView(summaryView);
@@ -90,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
             summaryContent.innerHTML = `<p class="error">Error getting summary: ${response ? response.error : 'Unknown error'}</p>`;
             showView(summaryView);
 
-            // Clear any saved summary since we have an error
-            browser.storage.sync.remove('saved_summary');
+            // Clear any saved summary and URL since we have an error
+            browser.storage.sync.remove(['saved_summary', 'summary_url']);
           }
         }).catch(function(error) {
           console.error('Error:', error);
@@ -108,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     summaryContent.innerHTML = `<p class="error">Error getting summary: ${error}</p>`;
     showView(summaryView);
 
-    // Clear any saved summary since we have an error
-    browser.storage.sync.remove('saved_summary');
+    // Clear any saved summary and URL since we have an error
+    browser.storage.sync.remove(['saved_summary', 'summary_url']);
   }
 });
