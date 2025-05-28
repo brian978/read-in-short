@@ -16,10 +16,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "latest"
+          node-version: "lts/*"
 
       - name: Install web-ext
-        run: npm install -g web-ext@8.2.0
+        run: npm install -g web-ext
 
       - name: Installing dependencies
         run: |
@@ -30,9 +30,7 @@ jobs:
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-        run: |
-          chmod +x ./sign.sh
-          bash ./sign.sh
+        run: web-ext sign -s ./src -a ./dist --channel=listed --amo-metadata=./src/metadata.json --api-key="$AMO_JWT_ISSUER" --api-secret="$AMO_JWT_SECRET"
           
       - name: Renaming the extension
         run: |

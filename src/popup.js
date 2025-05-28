@@ -32,6 +32,15 @@ document.addEventListener('DOMContentLoaded', function() {
   summarizeBtn.addEventListener('click', summarizeArticle);
   resetBtn.addEventListener('click', resetView);
 
+  // Get settings button and add event listener to close popup when clicked
+  const settingsBtn = document.getElementById('settings-btn');
+  settingsBtn.addEventListener('click', function(e) {
+    // The link will still open settings.html in a new tab
+    browser.tabs.create({url: 'settings.html'});
+    // Close the popup
+    window.close();
+  });
+
   // Function to show a specific view and hide others
   function showView(viewToShow) {
     initialView.classList.add('hidden');
