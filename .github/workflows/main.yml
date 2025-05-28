@@ -19,7 +19,7 @@ jobs:
           node-version: "latest"
 
       - name: Install web-ext
-        run: npm install -g web-ext
+        run: npm install -g web-ext@8.2.0
 
       - name: Installing dependencies
         run: |
