@@ -50,7 +50,7 @@ function makeApiRequest(params, sendResponse) {
   Remember to not include any requests for clarification or offers for more information,
   since this is a one-way interaction with no opportunity for follow-up.
   When summarizing, if the article is in Romanian, use the same language.
-  If the article is in English, or another language, use English.`;
+  If the article is in English, or another language, use English. Instead of providing the response in Markdown format, use HTML tags.`;
   const maxRetries = 3;
 
   // Log API key information (safely)

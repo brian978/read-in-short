@@ -17,7 +17,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const bodyContent = doc.body;
 
     // Remove potentially dangerous elements
-    const dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'meta', 'style', 'link', 'base'];
+    const dangerousTags = [
+      'script',
+      'iframe',
+      'object',
+      'embed',
+      'form',
+      'input',
+      'button',
+      'meta',
+      'style',
+      'link',
+      'base'];
     dangerousTags.forEach(tag => {
       const elements = bodyContent.getElementsByTagName(tag);
       for (let i = elements.length - 1; i >= 0; i--) {
@@ -42,8 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Remove javascript: URLs
-        if ((attrName === 'href' || attrName === 'src') && 
-            attributes[j].value.toLowerCase().trim().startsWith('javascript:')) {
+        if ((attrName === 'href' || attrName === 'src') &&
+            attributes[j].value.toLowerCase().
+                trim().
+                startsWith('javascript:')) {
           element.removeAttribute(attrName);
         }
       }
@@ -65,22 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Use XMLSerializer to convert DOM nodes to strings
     const serializer = new XMLSerializer();
     return serializer.serializeToString(node);
-  }
-
-  // Function to sanitize HTML (for backward compatibility)
-  function sanitizeHtml(html) {
-    // Create a temporary container
-    const tempContainer = document.createElement('div');
-
-    // Append the sanitized fragment to the container
-    tempContainer.appendChild(createSanitizedFragment(html));
-
-    // Use XMLSerializer to safely convert DOM nodes to strings
-    // This is still needed for backward compatibility with existing code
-    // that expects an HTML string, but we're not using it for rendering
-    return Array.from(tempContainer.childNodes)
-      .map(serializeNodeToHtml)
-      .join('');
   }
 
   // Function to safely create and append elements
@@ -108,19 +105,16 @@ document.addEventListener('DOMContentLoaded', function() {
     return link;
   }
 
-  // Function to safely render markdown content
-  function renderSafeMarkdown(container, markdownText) {
+  // Function to safely render HTML content
+  function renderSafeHTML(container, htmlContent) {
     // Clear existing content
     container.textContent = '';
 
     // Create a container element for the content
     const contentElement = document.createElement('div');
 
-    // Use marked to parse the markdown
-    const parsedHtml = marked.parse(markdownText);
-
     // Create a sanitized document fragment from the parsed HTML
-    const sanitizedFragment = createSanitizedFragment(parsedHtml);
+    const sanitizedFragment = createSanitizedFragment(htmlContent);
 
     // Append the sanitized fragment directly to the content element
     contentElement.appendChild(sanitizedFragment);
@@ -133,7 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
   browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) {
     const currentUrl = tabs[0].url;
 
-    browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project', 'saved_summary', 'summary_url']).then(function(result) {
+    browser.storage.sync.get([
+      'openai_api_key',
+      'openai_organization',
+      'openai_project',
+      'saved_summary',
+      'summary_url']).then(function(result) {
       if (!result.openai_api_key) {
         // Clear existing content
         summaryContent.textContent = '';
@@ -147,13 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
         showView(summaryView);
       } else if (result.saved_summary && result.summary_url === currentUrl) {
         // If we have a saved summary for the current URL, display it safely
-        renderSafeMarkdown(summaryContent, result.saved_summary);
+        renderSafeHTML(summaryContent, result.saved_summary);
         showView(summaryView);
       } else if (result.saved_summary && result.summary_url !== currentUrl) {
         // If the URL has changed, clear the saved summary
-        browser.storage.sync.remove(['saved_summary', 'summary_url']).then(function() {
-          showView(initialView);
-        });
+        browser.storage.sync.remove(['saved_summary', 'summary_url']).
+            then(function() {
+              showView(initialView);
+            });
       }
     });
   });
@@ -193,9 +193,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Function to reset to initial view
   function resetView() {
     // Clear the saved summary and URL
-    browser.storage.sync.remove(['saved_summary', 'summary_url']).then(function() {
-      showView(initialView);
-    });
+    browser.storage.sync.remove(['saved_summary', 'summary_url']).
+        then(function() {
+          showView(initialView);
+        });
   }
 
   // Function to summarize the article
@@ -203,78 +204,89 @@ document.addEventListener('DOMContentLoaded', function() {
     showView(loadingView);
 
     // Get the current tab URL
-    browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) {
-      const currentUrl = tabs[0].url;
+    browser.tabs.query({active: true, currentWindow: true}).
+        then(function(tabs) {
+          const currentUrl = tabs[0].url;
 
-      // Get an API key and other settings from storage
-      browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project']).then(function(result) {
-        if (!result.openai_api_key) {
-          // Clear existing content
-          summaryContent.textContent = '';
+          // Get an API key and other settings from storage
+          browser.storage.sync.get(
+              ['openai_api_key', 'openai_organization', 'openai_project']).
+              then(function(result) {
+                if (!result.openai_api_key) {
+                  // Clear existing content
+                  summaryContent.textContent = '';
 
-          // Create error message with link
-          const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
-          errorParagraph.textContent = 'Please set your OpenAI API key in the ';
-          createSafeLink(errorParagraph, 'settings.html', 'settings', '_blank');
-          errorParagraph.appendChild(document.createTextNode('.'));
+                  // Create error message with link
+                  const errorParagraph = createSafeElement(summaryContent, 'p',
+                      'error');
+                  errorParagraph.textContent = 'Please set your OpenAI API key in the ';
+                  createSafeLink(errorParagraph, 'settings.html', 'settings',
+                      '_blank');
+                  errorParagraph.appendChild(document.createTextNode('.'));
 
-          showView(summaryView);
-          return;
-        }
+                  showView(summaryView);
+                  return;
+                }
 
-        // Send request to background script for rate-limited API access
-        browser.runtime.sendMessage({
-          action: "summarizeArticle",
-          params: {
-            url: currentUrl,
-            apiKey: result.openai_api_key,
-            organization: result.openai_organization,
-            project: result.openai_project
-          }
-        }).then(function(response) {
-          if (response && response.success) {
-            const summary = response.data.output[0].content[0].text.trim();
+                // Send request to background script for rate-limited API access
+                browser.runtime.sendMessage({
+                  action: 'summarizeArticle',
+                  params: {
+                    url: currentUrl,
+                    apiKey: result.openai_api_key,
+                    organization: result.openai_organization,
+                    project: result.openai_project,
+                  },
+                }).then(function(response) {
+                  if (response && response.success) {
+                    const summary = response.data.output[0].content[0].text.trim();
 
-            // Save the summary and URL to browser storage
-            browser.storage.sync.set({ 
-              'saved_summary': summary,
-              'summary_url': currentUrl
-            }).then(function() {
-              // Parse the Markdown and display it safely
-              renderSafeMarkdown(summaryContent, summary);
-              showView(summaryView);
-            });
-          } else {
-            console.error('Error:', response ? response.error : 'Unknown error');
+                    // Save the summary and URL to browser storage
+                    browser.storage.sync.set({
+                      'saved_summary': summary,
+                      'summary_url': currentUrl,
+                    }).then(function() {
+                      // Parse the Markdown and display it safely
+                      renderSafeHTML(summaryContent, summary);
+                      showView(summaryView);
+                    });
+                  } else {
+                    console.error('Error:',
+                        response ? response.error : 'Unknown error');
 
-            // Clear existing content
-            summaryContent.textContent = '';
+                    // Clear existing content
+                    summaryContent.textContent = '';
 
-            // Create error message
-            const errorMessage = response ? response.error : 'Unknown error';
-            const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
-            errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
+                    // Create error message
+                    const errorMessage = response
+                        ? response.error
+                        : 'Unknown error';
+                    const errorParagraph = createSafeElement(summaryContent,
+                        'p', 'error');
+                    errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
 
-            showView(summaryView);
+                    showView(summaryView);
 
-            // Clear any saved summary and URL since we have an error
-            browser.storage.sync.remove(['saved_summary', 'summary_url']);
-          }
-        }).catch(function(error) {
-          console.error('Error:', error);
+                    // Clear any saved summary and URL since we have an error
+                    browser.storage.sync.remove(
+                        ['saved_summary', 'summary_url']);
+                  }
+                }).catch(function(error) {
+                  console.error('Error:', error);
 
-          // Clear existing content
-          summaryContent.textContent = '';
+                  // Clear existing content
+                  summaryContent.textContent = '';
 
-          // Create error message
-          const errorMessage = error.message || 'Unknown error';
-          const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
-          errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
+                  // Create error message
+                  const errorMessage = error.message || 'Unknown error';
+                  const errorParagraph = createSafeElement(summaryContent, 'p',
+                      'error');
+                  errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
 
-          showView(summaryView);
+                  showView(summaryView);
+                });
+              });
         });
-      });
-    });
   }
 
   // Function to handle errors and display them to the user
