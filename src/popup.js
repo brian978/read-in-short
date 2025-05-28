@@ -7,17 +7,109 @@ document.addEventListener('DOMContentLoaded', function() {
   const summarizeBtn = document.getElementById('summarize-btn');
   const resetBtn = document.getElementById('reset-btn');
 
+  // Function to sanitize HTML content
+  function sanitizeHtml(html) {
+    // Create a temporary div element
+    const tempDiv = document.createElement('div');
+
+    // Set the HTML content
+    tempDiv.innerHTML = html;
+
+    // Remove potentially dangerous elements
+    const dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'meta', 'style', 'link', 'base'];
+    dangerousTags.forEach(tag => {
+      const elements = tempDiv.getElementsByTagName(tag);
+      for (let i = elements.length - 1; i >= 0; i--) {
+        elements[i].parentNode.removeChild(elements[i]);
+      }
+    });
+
+    // Remove event handlers from all elements
+    const allElements = tempDiv.getElementsByTagName('*');
+    for (let i = 0; i < allElements.length; i++) {
+      const element = allElements[i];
+      const attributes = element.attributes;
+
+      for (let j = attributes.length - 1; j >= 0; j--) {
+        const attrName = attributes[j].name;
+
+        // Remove event handlers (attributes starting with "on")
+        if (attrName.startsWith('on')) {
+          element.removeAttribute(attrName);
+        }
+
+        // Remove javascript: URLs
+        if ((attrName === 'href' || attrName === 'src') && 
+            attributes[j].value.toLowerCase().trim().startsWith('javascript:')) {
+          element.removeAttribute(attrName);
+        }
+      }
+    }
+
+    // Return the sanitized HTML
+    return tempDiv.innerHTML;
+  }
+
+  // Function to safely create and append elements
+  function createSafeElement(parentElement, tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) {
+      element.className = className;
+    }
+    if (text) {
+      element.textContent = text;
+    }
+    parentElement.appendChild(element);
+    return element;
+  }
+
+  // Function to safely create a link
+  function createSafeLink(parentElement, href, text, target) {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = text;
+    if (target) {
+      link.target = target;
+    }
+    parentElement.appendChild(link);
+    return link;
+  }
+
+  // Function to safely render markdown content
+  function renderSafeMarkdown(container, markdownText) {
+    // Clear existing content
+    container.textContent = '';
+
+    // Create a paragraph element for the content
+    const contentElement = document.createElement('div');
+
+    // Use marked to parse the markdown and then sanitize the HTML
+    const parsedHtml = marked.parse(markdownText);
+    contentElement.innerHTML = sanitizeHtml(parsedHtml);
+
+    // Append the content to the container
+    container.appendChild(contentElement);
+  }
+
   // Check if an API key is set and load other settings
   browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) {
     const currentUrl = tabs[0].url;
 
     browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project', 'saved_summary', 'summary_url']).then(function(result) {
       if (!result.openai_api_key) {
-        summaryContent.innerHTML = '<p class="error">Please set your OpenAI API key in the <a href="settings.html" target="_blank">settings</a>.</p>';
+        // Clear existing content
+        summaryContent.textContent = '';
+
+        // Create error message with link
+        const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
+        errorParagraph.textContent = 'Please set your OpenAI API key in the ';
+        createSafeLink(errorParagraph, 'settings.html', 'settings', '_blank');
+        errorParagraph.appendChild(document.createTextNode('.'));
+
         showView(summaryView);
       } else if (result.saved_summary && result.summary_url === currentUrl) {
-        // If we have a saved summary for the current URL, display it
-        summaryContent.innerHTML = marked.parse(result.saved_summary);
+        // If we have a saved summary for the current URL, display it safely
+        renderSafeMarkdown(summaryContent, result.saved_summary);
         showView(summaryView);
       } else if (result.saved_summary && result.summary_url !== currentUrl) {
         // If the URL has changed, clear the saved summary
@@ -79,7 +171,15 @@ document.addEventListener('DOMContentLoaded', function() {
       // Get an API key and other settings from storage
       browser.storage.sync.get(['openai_api_key', 'openai_organization', 'openai_project']).then(function(result) {
         if (!result.openai_api_key) {
-          summaryContent.innerHTML = '<p class="error">Please set your OpenAI API key in the <a href="settings.html" target="_blank">settings</a>.</p>';
+          // Clear existing content
+          summaryContent.textContent = '';
+
+          // Create error message with link
+          const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
+          errorParagraph.textContent = 'Please set your OpenAI API key in the ';
+          createSafeLink(errorParagraph, 'settings.html', 'settings', '_blank');
+          errorParagraph.appendChild(document.createTextNode('.'));
+
           showView(summaryView);
           return;
         }
@@ -102,13 +202,21 @@ document.addEventListener('DOMContentLoaded', function() {
               'saved_summary': summary,
               'summary_url': currentUrl
             }).then(function() {
-              // Parse the Markdown and display it
-              summaryContent.innerHTML = marked.parse(summary);
+              // Parse the Markdown and display it safely
+              renderSafeMarkdown(summaryContent, summary);
               showView(summaryView);
             });
           } else {
             console.error('Error:', response ? response.error : 'Unknown error');
-            summaryContent.innerHTML = `<p class="error">Error getting summary: ${response ? response.error : 'Unknown error'}</p>`;
+
+            // Clear existing content
+            summaryContent.textContent = '';
+
+            // Create error message
+            const errorMessage = response ? response.error : 'Unknown error';
+            const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
+            errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
+
             showView(summaryView);
 
             // Clear any saved summary and URL since we have an error
@@ -116,7 +224,15 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }).catch(function(error) {
           console.error('Error:', error);
-          summaryContent.innerHTML = `<p class="error">Error getting summary: ${error.message || 'Unknown error'}</p>`;
+
+          // Clear existing content
+          summaryContent.textContent = '';
+
+          // Create error message
+          const errorMessage = error.message || 'Unknown error';
+          const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
+          errorParagraph.textContent = `Error getting summary: ${errorMessage}`;
+
           showView(summaryView);
         });
       });
@@ -126,7 +242,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Function to handle errors and display them to the user
   function handleApiError(error) {
     console.error('Error:', error);
-    summaryContent.innerHTML = `<p class="error">Error getting summary: ${error}</p>`;
+
+    // Clear existing content
+    summaryContent.textContent = '';
+
+    // Create error message
+    const errorParagraph = createSafeElement(summaryContent, 'p', 'error');
+    errorParagraph.textContent = `Error getting summary: ${error}`;
+
     showView(summaryView);
 
     // Clear any saved summary and URL since we have an error
