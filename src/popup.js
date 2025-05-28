@@ -7,25 +7,28 @@ document.addEventListener('DOMContentLoaded', function() {
   const summarizeBtn = document.getElementById('summarize-btn');
   const resetBtn = document.getElementById('reset-btn');
 
-  // Function to sanitize HTML content
-  function sanitizeHtml(html) {
-    // Create a temporary div element
-    const tempDiv = document.createElement('div');
+  // Function to create a sanitized document fragment from HTML
+  function createSanitizedFragment(html) {
+    // Use DOMParser to parse HTML string into a document
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-    // Set the HTML content
-    tempDiv.innerHTML = html;
+    // Process the body content of the parsed document
+    const bodyContent = doc.body;
 
     // Remove potentially dangerous elements
     const dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'meta', 'style', 'link', 'base'];
     dangerousTags.forEach(tag => {
-      const elements = tempDiv.getElementsByTagName(tag);
+      const elements = bodyContent.getElementsByTagName(tag);
       for (let i = elements.length - 1; i >= 0; i--) {
-        elements[i].parentNode.removeChild(elements[i]);
+        if (elements[i] && elements[i].parentNode) {
+          elements[i].parentNode.removeChild(elements[i]);
+        }
       }
     });
 
     // Remove event handlers from all elements
-    const allElements = tempDiv.getElementsByTagName('*');
+    const allElements = bodyContent.getElementsByTagName('*');
     for (let i = 0; i < allElements.length; i++) {
       const element = allElements[i];
       const attributes = element.attributes;
@@ -46,8 +49,38 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    // Return the sanitized HTML
-    return tempDiv.innerHTML;
+    // Create a document fragment to hold the sanitized content
+    const fragment = document.createDocumentFragment();
+
+    // Clone the sanitized nodes to the fragment
+    Array.from(bodyContent.childNodes).forEach(node => {
+      fragment.appendChild(node.cloneNode(true));
+    });
+
+    return fragment;
+  }
+
+  // Function to safely serialize a DOM node to HTML string
+  function serializeNodeToHtml(node) {
+    // Use XMLSerializer to convert DOM nodes to strings
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(node);
+  }
+
+  // Function to sanitize HTML (for backward compatibility)
+  function sanitizeHtml(html) {
+    // Create a temporary container
+    const tempContainer = document.createElement('div');
+
+    // Append the sanitized fragment to the container
+    tempContainer.appendChild(createSanitizedFragment(html));
+
+    // Use XMLSerializer to safely convert DOM nodes to strings
+    // This is still needed for backward compatibility with existing code
+    // that expects an HTML string, but we're not using it for rendering
+    return Array.from(tempContainer.childNodes)
+      .map(serializeNodeToHtml)
+      .join('');
   }
 
   // Function to safely create and append elements
@@ -80,14 +113,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear existing content
     container.textContent = '';
 
-    // Create a paragraph element for the content
+    // Create a container element for the content
     const contentElement = document.createElement('div');
 
-    // Use marked to parse the markdown and then sanitize the HTML
+    // Use marked to parse the markdown
     const parsedHtml = marked.parse(markdownText);
-    contentElement.innerHTML = sanitizeHtml(parsedHtml);
 
-    // Append the content to the container
+    // Create a sanitized document fragment from the parsed HTML
+    const sanitizedFragment = createSanitizedFragment(parsedHtml);
+
+    // Append the sanitized fragment directly to the content element
+    contentElement.appendChild(sanitizedFragment);
+
+    // Append the content element to the container
     container.appendChild(contentElement);
   }
 
