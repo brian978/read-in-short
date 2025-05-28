@@ -32,12 +32,12 @@ jobs:
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: |
           chmod +x ./sign.sh
-          ./sign.sh
+          bash ./sign.sh
           
       - name: Renaming the extension
         run: |
           chmod +x ./rename.sh
-          ./rename.sh
+          bash ./rename.sh
 
       - name: Upload .xpi file
         uses: actions/upload-artifact@v4
