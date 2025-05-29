@@ -53,10 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Remove javascript: URLs
-        if ((attrName === 'href' || attrName === 'src') &&
-            attributes[j].value.toLowerCase().
-                trim().
-                startsWith('javascript:')) {
+        if ((attrName === 'href' || attrName === 'src')
+            && (isRiskyAttribute(attributes[j].value.toLowerCase().trim()))
+        ) {
           element.removeAttribute(attrName);
         }
       }
@@ -71,6 +70,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     return fragment;
+  }
+
+  /**
+   * @param {string} attrValue
+   * @returns {boolean}
+   */
+  function isRiskyAttribute(attrValue) {
+    return attrValue.startsWith('javascript:')
+        || attrValue.startsWith('data:')
+        || attrValue.startsWith('vbscript:');
   }
 
   // Function to safely serialize a DOM node to HTML string
