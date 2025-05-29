@@ -54,9 +54,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Remove javascript: URLs
         if ((attrName === 'href' || attrName === 'src') &&
-            attributes[j].value.toLowerCase().
+            (attributes[j].value.toLowerCase().
                 trim().
-                startsWith('javascript:')) {
+                startsWith('javascript:') ||
+             attributes[j].value.toLowerCase().
+                trim().
+                startsWith('data:') ||
+             attributes[j].value.toLowerCase().
+                trim().
+                startsWith('vbscript:'))) {
           element.removeAttribute(attrName);
         }
       }
